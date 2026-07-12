@@ -1,0 +1,79 @@
+:root {
+  --bg: #0f1115;
+  --surface: #171a21;
+  --border: #262b36;
+  --text: #e6e8eb;
+  --muted: #9aa4b2;
+  --accent: #4f8cff;
+  --ok: #2ea043;
+  --warn: #d29922;
+  --bad: #f85149;
+  --idle: #6e7681;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.container { max-width: 1000px; margin: 0 auto; padding: 2rem 1.25rem; }
+
+.nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.nav-brand { font-weight: 600; letter-spacing: -0.01em; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem;
+}
+
+.stat-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem; margin-bottom: 2rem;
+}
+.stat { text-align: center; }
+.stat-value { font-size: 2rem; font-weight: 600; }
+.stat-label { color: var(--muted); font-size: 0.85rem; }
+
+label { display: block; margin-bottom: 0.35rem; font-size: 0.9rem; color: var(--muted); }
+
+input, select, textarea {
+  width: 100%; padding: 0.6rem 0.75rem; margin-bottom: 1rem;
+  background: var(--bg); color: var(--text);
+  border: 1px solid var(--border); border-radius: 6px; font: inherit;
+}
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+button {
+  padding: 0.6rem 1rem; border: none; border-radius: 6px;
+  background: var(--accent); color: #fff; font: inherit; font-weight: 500;
+  cursor: pointer;
+}
+button:hover { opacity: 0.9; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+button.secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
+button.danger { background: transparent; border: 1px solid var(--bad); color: var(--bad); }
+
+.badge {
+  display: inline-block; padding: 0.15rem 0.55rem; border-radius: 999px;
+  font-size: 0.75rem; font-weight: 500;
+}
+.badge.COMPLIANT     { background: rgba(46,160,67,0.15);  color: var(--ok); }
+.badge.NON_COMPLIANT { background: rgba(248,81,73,0.15);  color: var(--bad); }
+.badge.IN_REVIEW     { background: rgba(210,153,34,0.15); color: var(--warn); }
+.badge.NOT_ASSESSED  { background: rgba(110,118,129,0.15);color: var(--idle); }
+
+.row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.muted { color: var(--muted); font-size: 0.9rem; }
+.error { color: var(--bad); font-size: 0.9rem; margin-bottom: 1rem; }
+.auth-wrap { max-width: 380px; margin: 4rem auto; padding: 0 1.25rem; }

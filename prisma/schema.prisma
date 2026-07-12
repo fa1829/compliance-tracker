@@ -1,0 +1,114 @@
+// Prisma schema — PostgreSQL
+// Defines the data model and generates a fully type-safe client.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------
+// Authentication models (Auth.js / NextAuth Prisma adapter shape)
+// ---------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  passwordHash  String?   // null for OAuth-only users
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+  assets   Asset[]   // a user owns many assets (multi-tenancy boundary)
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------
+// Domain models
+// ---------------------------------------------------------------
+
+enum AssetType {
+  SERVER
+  APPLICATION
+  DATABASE
+  NETWORK_DEVICE
+  ENDPOINT
+  CLOUD_RESOURCE
+}
+
+enum ComplianceStatus {
+  COMPLIANT
+  NON_COMPLIANT
+  IN_REVIEW
+  NOT_ASSESSED
+}
+
+/// An asset is any system in scope for compliance (a server, app, database…).
+model Asset {
+  id          String    @id @default(cuid())
+  name        String
+  type        AssetType
+  description String?
+  owner       String?   // team or person accountable for the asset
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Ownership: every asset belongs to exactly one user. All queries are
+  // scoped by userId, which is what enforces tenant isolation.
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  checks ComplianceCheck[]
+
+  @@index([userId])
+}
+
+/// A compliance check records the status of one control against one asset.
+model ComplianceCheck {
+  id          String           @id @default(cuid())
+  framework   String           // e.g. "PCI-DSS 8.3.4", "ISO 27001 A.9.4.2"
+  status      ComplianceStatus @default(NOT_ASSESSED)
+  notes       String?
+  lastChecked DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  assetId String
+  asset   Asset  @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([assetId])
+}
